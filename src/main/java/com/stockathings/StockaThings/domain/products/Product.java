@@ -10,7 +10,7 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-@Table(name = "Products") // Nome da nossa tabela no Postgree
+@Table(name = "products") // Nome da nossa tabela no Postgree
 @Entity //Quer dizer que tudo que esta dentro da classe vira uma instancia o entity precisa ter um @Id pra funcionar
 @Getter // gera automaticamente os getters e os setters dentro de nossa classe
 @Setter
