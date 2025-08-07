@@ -19,8 +19,8 @@ import java.util.UUID;
 public class Product {
 
     @Id // Permite que o proprio banco crie o id, sem precisar passar por parametro
-    @GeneratedValue // esse gera o id pra nos
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // A estratégia GenerationType.IDENTITY faz com que o banco gere IDs auto-incrementais, como 1, 2, 3,
+    private Long id;
 
     private String nameProduct;
 
