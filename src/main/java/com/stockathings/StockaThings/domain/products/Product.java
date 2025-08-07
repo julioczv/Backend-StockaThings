@@ -32,6 +32,6 @@ public class Product {
 
     private Integer stockQuantity;
 
-    private String Type;
+    private String type;
 
 }
