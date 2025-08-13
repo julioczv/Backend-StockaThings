@@ -1,6 +1,6 @@
-CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+/*CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
-/*CREATE TABLE categoria
+CREATE TABLE categoria
 (
     categoria_id   SERIAL PRIMARY KEY,
     categoria_nome VARCHAR(100)
@@ -64,7 +64,7 @@ CREATE TABLE produto
     categoria_id       INTEGER REFERENCES categoria (categoria_id)
 );*/
 
-CREATE TABLE compra
+/*CREATE TABLE compra
 (
     compra_id        SERIAL PRIMARY KEY,
     compra_data      TIMESTAMP,

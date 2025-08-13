@@ -1,11 +1,15 @@
 package com.stockathings.StockaThings.domain.service;
 
+import com.stockathings.StockaThings.domain.category.Category;
 import com.stockathings.StockaThings.domain.products.PageableDTO;
 import com.stockathings.StockaThings.domain.products.Product;
 import com.stockathings.StockaThings.domain.products.ProductRequestDTO;
 import com.stockathings.StockaThings.domain.products.ProductResponseDTO;
+import com.stockathings.StockaThings.repositories.CategoryRepository;
 import com.stockathings.StockaThings.repositories.ProductRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.stockathings.StockaThings.repositories.UnityMeasureRepository;
+import org.springframework.transaction.annotation.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -15,20 +19,31 @@ import java.util.List;
 import java.util.UUID;
 
 @Service //Diz para a classe que ela é do tipo service
+@RequiredArgsConstructor
 public class ProductService {
 
-    @Autowired
     private ProductRepository repository;
+    private final UnityMeasureRepository unidadeRepo;
+    private final CategoryRepository categoriaRepo;
 
+    @Transactional
     public Product createProduct(ProductRequestDTO data /*Aqui chamados a nossa DTO de data*/){ //Passamos a nossa DTO para mapeala
         Product product = new Product(); //Instanciamos a classe para a poder receber os campos
 
-        product.setNameProduct(data.nameProduct());
-        product.setDescription(data.description());
-        product.setCostPrice(data.costPrice());
-        product.setSellingPrice(data.sellingPrice());
-        product.setStockQuantity(data.stockQuantity());
-        product.setType(data.type());
+        var unidade = unidadeRepo.findById(data.unidadeMedidaId())
+                .orElseThrow(() -> new RuntimeException("Unidade de medida não encontrada"));
+
+        var categoria = categoriaRepo.findById(data.categoriaId())
+                .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
+
+        product.setNomeProduto(data.nomeProduto());
+        product.setDescricaoProduto(data.descricaoProduto());
+        product.setValorPagoProduto(data.valorPagoProduto());
+        product.setValorVendaProduto(data.valorVendaProduto());
+        product.setQuantidadeProduto(data.quantidadeProduto());
+        product.setUnidadeMedida(unidade);
+        product.setCategoria((Category) categoria);
+
 
         repository.save(product);
 
@@ -40,13 +55,17 @@ public class ProductService {
         Page<Product> productsPage = repository.findAll(pageable);
 
         List<ProductResponseDTO> dtoList = productsPage.map(product -> new ProductResponseDTO(
-                product.getId(),
-                product.getNameProduct(),
-                product.getDescription(),
-                product.getCostPrice(),
-                product.getSellingPrice(),
-                product.getStockQuantity(),
-                product.getType()
+                product.getIdProduto(),
+                product.getNomeProduto(),
+                product.getDescricaoProduto(),
+                product.getValorPagoProduto(),
+                product.getValorVendaProduto(),
+                product.getQuantidadeProduto(),
+                product.getUnidadeMedida().getIdUnidMedida(),
+                product.getUnidadeMedida().getUnidMedida(),
+                product.getCategoria().getIdCategoria(),
+                product.getCategoria().getNomeCategoria()
+
         )).getContent();
 
         return new PageableDTO<>(
@@ -59,8 +78,8 @@ public class ProductService {
     }
 
 
-    public String deleteProduct(UUID id){
-        repository.deleteById(id);
+    public String deleteProduct(Long idProduto){
+        repository.deleteById(idProduto);
         return "Produto deletado com sucesso !";
     }
 }

@@ -2,12 +2,15 @@ package com.stockathings.StockaThings.domain.products;
 
 import java.math.BigDecimal;
 
-public record ProductRequestDTO(String nameProduct,
-                                String description,
-                                BigDecimal costPrice,
-                                BigDecimal sellingPrice,
-                                Integer stockQuantity,
-                                String type)
+public record ProductRequestDTO(String nomeProduto,
+                                String descricaoProduto,
+                                BigDecimal valorPagoProduto,
+                                BigDecimal valorVendaProduto,
+                                Integer quantidadeProduto,
+                                Long unidadeMedidaId,
+                                Long categoriaId
+
+)
 {
 
 }

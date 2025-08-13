@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/products")
+@RequestMapping("/api/produtos")
 public class ProductController {
 
     @Autowired
@@ -39,9 +39,8 @@ public class ProductController {
 
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteProduct(@PathVariable UUID id) {
-        productService.deleteProduct(id);
+    public ResponseEntity<String> deleteProduct(@PathVariable Long idProduto) {
+        productService.deleteProduct(idProduto);
         return ResponseEntity.ok("Produto deletado com sucesso !");
     }
-
 }
