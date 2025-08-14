@@ -22,7 +22,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ProductService {
 
-    private ProductRepository repository;
+    private final ProductRepository repository;
     private final UnityMeasureRepository unidadeRepo;
     private final CategoryRepository categoriaRepo;
 
@@ -42,7 +42,7 @@ public class ProductService {
         product.setValorVendaProduto(data.valorVendaProduto());
         product.setQuantidadeProduto(data.quantidadeProduto());
         product.setUnidadeMedida(unidade);
-        product.setCategoria((Category) categoria);
+        product.setCategoria(categoria);
 
 
         repository.save(product);

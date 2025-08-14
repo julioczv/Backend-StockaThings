@@ -42,10 +42,10 @@ public class Product {
     private Integer QuantidadeProduto;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "unidmed_nome")
+    @JoinColumn(name = "unidmed_id")
     private UnityMeasure unidadeMedida;
 
-    @JoinColumn(name = "categoria_nome")
+    @JoinColumn(name = "categoria_id")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Category categoria;
 

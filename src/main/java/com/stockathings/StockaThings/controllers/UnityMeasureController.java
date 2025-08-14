@@ -33,7 +33,7 @@ public class UnityMeasureController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteProduct(@PathVariable Long idUnidMedida) {
+    public ResponseEntity<String> deleteProduct(@PathVariable("id") Long idUnidMedida) {
         unityService.deleteUnity(idUnidMedida);
         return ResponseEntity.ok("Produto deletado com sucesso !");
     }
