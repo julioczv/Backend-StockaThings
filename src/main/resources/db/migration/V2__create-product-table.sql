@@ -1,119 +1,137 @@
-/*CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
-CREATE TABLE categoria
+CREATE TABLE public.categoria
 (
-    categoria_id   SERIAL PRIMARY KEY,
-    categoria_nome VARCHAR(100)
+    categoria_id   serial4      NOT NULL,
+    categoria_nome varchar(100) NOT NULL,
+    CONSTRAINT categoria_pkey PRIMARY KEY (categoria_id),
+    CONSTRAINT uk_categoria_nome UNIQUE (categoria_nome)
 );
 
-CREATE TABLE usuario
+CREATE TABLE public.fornecedor
 (
-    usuario_id          UUID DEFAULT gen_random_uuid() PRIMARY KEY ,
-    usuario_nome        VARCHAR(100) NOT NULL,
-    usuario_cnpj        VARCHAR(100) NOT NULL,
-    usuario_nome_social VARCHAR(100) NOT NULL,
-    usuario_cep         VARCHAR(15),
-    usuario_endereco    VARCHAR(100),
-    usuario_numendereco VARCHAR(10),
-    usuario_bairro      VARCHAR(100),
-    usuario_fone        VARCHAR(100),
-    usuario_email       VARCHAR(100),
-    usuario_cidade      CHAR(40),
-    usuario_estado      CHAR(20)
-);
-
-CREATE TABLE fornecedor
-(
-    fornecedor_id        UUID DEFAULT gen_random_uuid() PRIMARY KEY ,
-    fornecedor_nome      VARCHAR(95),
-    fornecedor_rsocial   VARCHAR(95),
-    fornecedor_ie        VARCHAR(95),
-    fornecedor_cnpj      VARCHAR(95),
-    fornecedor_cep       VARCHAR(95),
-    fornecedor_endereco  VARCHAR(95),
-    fornecedor_bairro    VARCHAR(95),
-    fornecedor_fone      VARCHAR(95),
-    fornecedor_cel       VARCHAR(95),
-    fornecedor_email     VARCHAR(95),
-    fornecedor_endnumero VARCHAR(95),
-    fornecedor_cidade    VARCHAR(95),
-    fornecedor_estado    VARCHAR(95)
-);*/
-
-/*CREATE TABLE tipopagamento
-(
-    tipopag_id   SERIAL PRIMARY KEY,
-    tipopag_nome VARCHAR(90) NOT NULL
-);
-
-CREATE TABLE unidmedida
-(
-    unidmed_id   SERIAL PRIMARY KEY,
-    unidmed_nome VARCHAR(95)
-);
-
-CREATE TABLE produto
-(
-    produto_id         SERIAL PRIMARY KEY,
-    produto_nome       VARCHAR(95),
-    produto_descricao  TEXT,
-    produto_valorpago  MONEY,
-    produto_valorvenda MONEY,
-    produto_qtde       INT,
-    unidmed_id         INTEGER REFERENCES unidmedida (unidmed_id),
-    categoria_id       INTEGER REFERENCES categoria (categoria_id)
-);*/
-
-/*CREATE TABLE compra
-(
-    compra_id        SERIAL PRIMARY KEY,
-    compra_data      TIMESTAMP,
-    compra_nfiscal   INTEGER,
-    compra_total     MONEY,
-    compra_nparcelas INTEGER,
-    compra_status    VARCHAR(95),
-    fornecedor_id     UUID DEFAULT gen_random_uuid() REFERENCES fornecedor (fornecedor_id),
-    tipopag_id       INTEGER REFERENCES tipopagamento (tipopag_id)
-);
-
-CREATE TABLE venda
-(
-    venda_id        SERIAL PRIMARY KEY,
-    venda_data      TIMESTAMP,
-    venda_nfiscal   INTEGER,
-    venda_total     MONEY,
-    venda_nparcelas INTEGER,
-    venda_status    VARCHAR(95),
-    usuario_id       UUID DEFAULT gen_random_uuid() REFERENCES usuario (usuario_id),
-    tipopag_id      INTEGER REFERENCES tipopagamento (tipopag_id),
-    venda_avista    INTEGER
-);
-
-CREATE TABLE itenscompra
-(
-    itc_id    INTEGER,
-    itc_qtde   INTEGER,
-    itc_valor  MONEY,
-    compra_id  INTEGER,
-    produto_id INTEGER,
-    PRIMARY KEY (itc_id, compra_id, produto_id),
-    FOREIGN KEY (compra_id) REFERENCES compra (compra_id),
-    FOREIGN KEY (produto_id) REFERENCES produto (produto_id)
-);
-
-CREATE TABLE itensvenda
-(
-    itv_id    INTEGER,
-    itv_qtde   FLOAT,
-    itv_valor  MONEY,
-    venda_id   INTEGER,
-    produto_id INTEGER,
-    PRIMARY KEY (itv_id, venda_id, produto_id),
-    FOREIGN KEY (venda_id) REFERENCES venda (venda_id),
-    FOREIGN KEY (produto_id) REFERENCES produto (produto_id)
+    fornecedor_id        uuid DEFAULT gen_random_uuid() NOT NULL,
+    fornecedor_nome      varchar(95)                    NULL,
+    fornecedor_rsocial   varchar(95)                    NULL,
+    fornecedor_ie        varchar(95)                    NULL,
+    fornecedor_cnpj      varchar(95)                    NULL,
+    fornecedor_cep       varchar(95)                    NULL,
+    fornecedor_endereco  varchar(95)                    NULL,
+    fornecedor_bairro    varchar(95)                    NULL,
+    fornecedor_fone      varchar(95)                    NULL,
+    fornecedor_cel       varchar(95)                    NULL,
+    fornecedor_email     varchar(95)                    NULL,
+    fornecedor_endnumero varchar(95)                    NULL,
+    fornecedor_cidade    varchar(95)                    NULL,
+    fornecedor_estado    varchar(95)                    NULL,
+    CONSTRAINT fornecedor_pkey PRIMARY KEY (fornecedor_id)
 );
 
 
+CREATE TABLE public.tipopagamento
+(
+    tipopag_id   serial4     NOT NULL,
+    tipopag_nome varchar(90) NOT NULL,
+    CONSTRAINT tipopagamento_pkey PRIMARY KEY (tipopag_id)
+);
+
+CREATE TABLE public.unidmedida
+(
+    unidmed_id   serial4     NOT NULL,
+    unidmed_nome varchar(95) NULL,
+    CONSTRAINT uk_unidmed_nome UNIQUE (unidmed_nome),
+    CONSTRAINT unidmedida_pkey PRIMARY KEY (unidmed_id)
+);
 
 
+CREATE TABLE public.usuario
+(
+    usuario_id          uuid DEFAULT gen_random_uuid() NOT NULL,
+    usuario_nome        varchar(100)                   NOT NULL,
+    usuario_cnpj        varchar(100)                   NOT NULL,
+    usuario_nome_social varchar(100)                   NOT NULL,
+    usuario_cep         varchar(15)                    NULL,
+    usuario_endereco    varchar(100)                   NULL,
+    usuario_numendereco varchar(10)                    NULL,
+    usuario_bairro      varchar(100)                   NULL,
+    usuario_fone        varchar(100)                   NULL,
+    usuario_email       varchar(100)                   NULL,
+    usuario_cidade      bpchar(40)                     NULL,
+    usuario_estado      bpchar(20)                     NULL,
+    CONSTRAINT usuario_pkey PRIMARY KEY (usuario_id)
+);
 
+
+CREATE TABLE public.compra
+(
+    compra_id        serial4     NOT NULL,
+    compra_data      timestamp   NULL,
+    compra_nfiscal   int4        NULL,
+    compra_total     money       NULL,
+    compra_nparcelas int4        NULL,
+    compra_status    varchar(95) NULL,
+    fornecedor_id    uuid DEFAULT gen_random_uuid(),
+    tipopag_id       int4        NULL,
+    CONSTRAINT compra_pkey PRIMARY KEY (compra_id),
+    CONSTRAINT compra_fornecedor_id_fkey FOREIGN KEY (fornecedor_id) REFERENCES public.fornecedor (fornecedor_id),
+    CONSTRAINT compra_tipopag_id_fkey FOREIGN KEY (tipopag_id) REFERENCES public.tipopagamento (tipopag_id)
+);
+
+
+CREATE TABLE public.produto
+(
+    produto_id         serial4     NOT NULL,
+    produto_nome       varchar(95) NULL,
+    produto_descricao  text        NULL,
+    produto_valorpago  numeric     NULL,
+    produto_valorvenda numeric     NULL,
+    produto_qtde       int4        NULL,
+    unidmed_id         int4        NULL,
+    categoria_id       int4        NULL,
+    CONSTRAINT produto_pkey PRIMARY KEY (produto_id),
+    CONSTRAINT produto_categoria_id_fkey FOREIGN KEY (categoria_id) REFERENCES public.categoria (categoria_id),
+    CONSTRAINT produto_unidmed_id_fkey FOREIGN KEY (unidmed_id) REFERENCES public.unidmedida (unidmed_id)
+);
+
+
+CREATE TABLE public.venda
+(
+    venda_id        serial4     NOT NULL,
+    venda_data      timestamp   NULL,
+    venda_nfiscal   int4        NULL,
+    venda_total     money       NULL,
+    venda_nparcelas int4        NULL,
+    venda_status    varchar(95) NULL,
+    usuario_id      uuid DEFAULT gen_random_uuid(),
+    tipopag_id      int4        NULL,
+    venda_avista    int4        NULL,
+    CONSTRAINT venda_pkey PRIMARY KEY (venda_id),
+    CONSTRAINT venda_tipopag_id_fkey FOREIGN KEY (tipopag_id) REFERENCES public.tipopagamento (tipopag_id),
+    CONSTRAINT venda_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.usuario (usuario_id)
+);
+
+
+CREATE TABLE public.itenscompra
+(
+    itc_id     int4  NOT NULL,
+    itc_qtde   int4  NULL,
+    itc_valor  money NULL,
+    compra_id  int4  NOT NULL,
+    produto_id int4  NOT NULL,
+    CONSTRAINT itenscompra_pkey PRIMARY KEY (itc_id, compra_id, produto_id),
+    CONSTRAINT itenscompra_compra_id_fkey FOREIGN KEY (compra_id) REFERENCES public.compra (compra_id),
+    CONSTRAINT itenscompra_produto_id_fkey FOREIGN KEY (produto_id) REFERENCES public.produto (produto_id)
+);
+
+
+CREATE TABLE public.itensvenda
+(
+    itv_id     int4   NOT NULL,
+    itv_qtde   float8 NULL,
+    itv_valor  money  NULL,
+    venda_id   int4   NOT NULL,
+    produto_id int4   NOT NULL,
+    CONSTRAINT itensvenda_pkey PRIMARY KEY (itv_id, venda_id, produto_id),
+    CONSTRAINT itensvenda_produto_id_fkey FOREIGN KEY (produto_id) REFERENCES public.produto (produto_id),
+    CONSTRAINT itensvenda_venda_id_fkey FOREIGN KEY (venda_id) REFERENCES public.venda (venda_id)
+);
