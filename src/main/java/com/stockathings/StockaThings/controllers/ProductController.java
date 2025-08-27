@@ -38,7 +38,7 @@ public class ProductController {
     public ResponseEntity<Product> update(@RequestBody ProductRequestDTO body){}*/
 
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{idProduto}")
     public ResponseEntity<String> deleteProduct(@PathVariable Long idProduto) {
         productService.deleteProduct(idProduto);
         return ResponseEntity.ok("Produto deletado com sucesso !");

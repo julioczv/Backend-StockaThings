@@ -1,4 +1,4 @@
-package com.stockathings.StockaThings.domain.profile;
+package com.stockathings.StockaThings.domain.users;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,20 +11,24 @@ import lombok.Setter;
 
 import java.util.UUID;
 
-@Table(name = "profile")
+
+@Table(name = "usuario")
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 
-public class Profile {
+public class User {
 
     @Id
     @GeneratedValue
     private UUID id;
 
-    private String email;
+    private String nome;
+    
+    private String cnpj;
 
-    private String password;
+    private String nomeSocial;
+
 }
