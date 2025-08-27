@@ -27,5 +27,8 @@ public class User {
 
     private String nome;
     
+    private String cnpj;
+
+    private String nomeSocial;
 
 }
