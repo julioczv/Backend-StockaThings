@@ -1,4 +1,4 @@
 package com.stockathings.StockaThings.domain.user;
 
-public record LoginResponseDTO() {
+public record LoginResponseDTO(String token) {
 }
