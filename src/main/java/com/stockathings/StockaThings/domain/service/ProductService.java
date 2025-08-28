@@ -1,10 +1,9 @@
 package com.stockathings.StockaThings.domain.service;
 
-import com.stockathings.StockaThings.domain.category.Category;
-import com.stockathings.StockaThings.domain.products.PageableDTO;
-import com.stockathings.StockaThings.domain.products.Product;
-import com.stockathings.StockaThings.domain.products.ProductRequestDTO;
-import com.stockathings.StockaThings.domain.products.ProductResponseDTO;
+import com.stockathings.StockaThings.domain.product.PageableDTO;
+import com.stockathings.StockaThings.domain.product.Product;
+import com.stockathings.StockaThings.domain.product.ProductRequestDTO;
+import com.stockathings.StockaThings.domain.product.ProductResponseDTO;
 import com.stockathings.StockaThings.repositories.CategoryRepository;
 import com.stockathings.StockaThings.repositories.ProductRepository;
 import com.stockathings.StockaThings.repositories.UnityMeasureRepository;
@@ -16,7 +15,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service //Diz para a classe que ela é do tipo service
 @RequiredArgsConstructor

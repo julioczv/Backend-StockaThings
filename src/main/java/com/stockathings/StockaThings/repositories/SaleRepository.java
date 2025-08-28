@@ -1,4 +1,8 @@
 package com.stockathings.StockaThings.repositories;
 
-public interface SaleRepository {
+import com.stockathings.StockaThings.domain.sale.Sale;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface SaleRepository extends JpaRepository<Sale,Long> {
+
 }

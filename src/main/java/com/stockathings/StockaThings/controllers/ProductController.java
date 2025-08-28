@@ -1,18 +1,14 @@
 package com.stockathings.StockaThings.controllers;
 
 
-import com.stockathings.StockaThings.domain.products.PageableDTO;
-import com.stockathings.StockaThings.domain.products.Product;
-import com.stockathings.StockaThings.domain.products.ProductRequestDTO;
-import com.stockathings.StockaThings.domain.products.ProductResponseDTO;
+import com.stockathings.StockaThings.domain.product.PageableDTO;
+import com.stockathings.StockaThings.domain.product.Product;
+import com.stockathings.StockaThings.domain.product.ProductRequestDTO;
+import com.stockathings.StockaThings.domain.product.ProductResponseDTO;
 import com.stockathings.StockaThings.domain.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/produtos")
