@@ -1,7 +1,6 @@
-package com.stockathings.StockaThings.domain.products;
+package com.stockathings.StockaThings.domain.product;
 
 import java.math.BigDecimal;
-import java.util.UUID;
 
 public record ProductResponseDTO(Long idProduto,
                                  String nomeProduto,
