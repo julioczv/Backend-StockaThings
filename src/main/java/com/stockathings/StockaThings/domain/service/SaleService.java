@@ -101,10 +101,12 @@ public class SaleService {
 
         var totals = new SaleTotalDTO(totalItens, totalVenda, totalCompra);
 
+        var tipoPagamento = sale.getTipoPagamento().getTipoPagamento();
+
         return new SaleResponseDTO(
                 sale.getIdVenda(),
                 sale.getDataVenda(),
-                sale.getTipoPagamento().toString(),
+                tipoPagamento,
                 saleItem,
                 totals
         );
