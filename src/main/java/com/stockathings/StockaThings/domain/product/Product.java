@@ -38,7 +38,7 @@ public class Product {
     private BigDecimal valorVendaProduto;
 
     @Column(name = "produto_qtde")
-    private Integer QuantidadeProduto;
+    private Integer qtdProduto;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "unidmed_id")

@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Table(name = "venda")
@@ -22,10 +23,10 @@ public class Sale {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "venda_id")
-    private Long id;
+    private Long idVenda;
 
     @Column(name = "venda_data")
-    private Date dataVenda;
+    private LocalDateTime dataVenda;
 
     @Column(name = "venda_total")
     private BigDecimal totalVenda;

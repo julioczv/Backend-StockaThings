@@ -38,7 +38,7 @@ public class ProductService {
         product.setDescricaoProduto(data.descricaoProduto());
         product.setValorPagoProduto(data.valorPagoProduto());
         product.setValorVendaProduto(data.valorVendaProduto());
-        product.setQuantidadeProduto(data.quantidadeProduto());
+        product.setQtdProduto(data.quantidadeProduto());
         product.setUnidadeMedida(unidade);
         product.setCategoria(categoria);
 
@@ -58,7 +58,7 @@ public class ProductService {
                 product.getDescricaoProduto(),
                 product.getValorPagoProduto(),
                 product.getValorVendaProduto(),
-                product.getQuantidadeProduto(),
+                product.getQtdProduto(),
                 product.getUnidadeMedida().getIdUnidMedida(),
                 product.getUnidadeMedida().getUnidMedida(),
                 product.getCategoria().getIdCategoria(),
