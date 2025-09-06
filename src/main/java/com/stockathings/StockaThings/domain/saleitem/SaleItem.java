@@ -29,4 +29,7 @@ public class SaleItem {
 
     @Column(name="itv_valor", precision=12, scale=2, nullable=false)
     private BigDecimal precoUnitario;
+
+    @Column(name="itv_custo")
+    private BigDecimal precoCustoUnitario;
 }

@@ -1,14 +1,14 @@
 package com.stockathings.StockaThings.controllers;
 
-import com.stockathings.StockaThings.domain.sale.Sale;
-import com.stockathings.StockaThings.domain.sale.SaleRequestDTO;
-import com.stockathings.StockaThings.domain.sale.SaleResponseDTO;
+import com.stockathings.StockaThings.domain.sale.*;
 import com.stockathings.StockaThings.domain.service.SaleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 
@@ -28,5 +28,13 @@ public class SaleController {
     @GetMapping
     public ResponseEntity<List<SaleResponseDTO>> findAll() {
         return ResponseEntity.ok(saleService.findAllSales());
+    }
+
+    @GetMapping("/periodo")
+    public SalePeriodDTO porPeriodo(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to
+    ) {
+        return saleService.findByDateRange(from, to);
     }
 }

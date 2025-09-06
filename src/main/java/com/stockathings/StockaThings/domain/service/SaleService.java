@@ -1,9 +1,6 @@
 package com.stockathings.StockaThings.domain.service;
 
-import com.stockathings.StockaThings.domain.sale.Sale;
-import com.stockathings.StockaThings.domain.sale.SaleRequestDTO;
-import com.stockathings.StockaThings.domain.sale.SaleResponseDTO;
-import com.stockathings.StockaThings.domain.sale.SaleTotalDTO;
+import com.stockathings.StockaThings.domain.sale.*;
 import com.stockathings.StockaThings.domain.saleitem.SaleItem;
 import com.stockathings.StockaThings.domain.saleitem.SaleItemResponseDTO;
 import com.stockathings.StockaThings.repositories.PaymentRepository;
@@ -16,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,8 +68,11 @@ public class SaleService {
             if (product.getQtdProduto() < qtd)
                 throw new IllegalArgumentException("Estoque insuficiente do produto: " + product.getNomeProduto());
 
+            // vendas
             BigDecimal unitSale = product.getValorVendaProduto();
             BigDecimal subtotalSale = unitSale.multiply(BigDecimal.valueOf(qtd));
+
+            //custos
             BigDecimal unitBuy = product.getValorPagoProduto();
             BigDecimal subtotalBuy = unitBuy.multiply(BigDecimal.valueOf(qtd));
 
@@ -80,6 +81,7 @@ public class SaleService {
             si.setProduto(product);
             si.setQuantidade(qtd);
             si.setPrecoUnitario(unitSale);
+            si.setPrecoCustoUnitario(unitBuy);
             itemRepository.save(si);
 
             //Baixa o estoque
@@ -91,9 +93,8 @@ public class SaleService {
             ));
 
             totalVenda = totalVenda.add(subtotalSale);
-            totalItens = totalItens + qtd;
-
             totalCompra = totalCompra.add(subtotalBuy);
+            totalItens += qtd;
         }
 
         sale.setTotalVenda(totalVenda);
@@ -114,55 +115,125 @@ public class SaleService {
 
     @Transactional
     public List<SaleResponseDTO> findAllSales() {
-        // 1) vendas + payment (sem N+1)
         var sales = saleRepository.findAll();
         if (sales.isEmpty()) return List.of();
 
-        // 2) pega todos os itens dessas vendas
         var ids = sales.stream().map(Sale::getIdVenda).toList();
         var allItems = itemRepository.findByVendaIdInFetchProduct(ids);
 
-        // 3) agrupa itens por venda
-        Map<Long, List<SaleItemResponseDTO>> itemsBySale =
-                allItems.stream().collect(Collectors.groupingBy(
-                        si -> si.getVenda().getIdVenda(),
-                        Collectors.mapping(
-                                si -> new SaleItemResponseDTO(
-                                        si.getIdItemVenda(),
-                                        si.getProduto().getIdProduto(),
-                                        si.getProduto().getNomeProduto(),
-                                        si.getQuantidade(),
-                                        si.getPrecoUnitario(),
-                                        si.getPrecoUnitario().multiply(BigDecimal.valueOf(si.getQuantidade())),
-                                        si.getProduto().getValorPagoProduto(),
-                                        si.getProduto().getValorPagoProduto().multiply(BigDecimal.valueOf(si.getQuantidade()))
-                                ),
-                                Collectors.toList()
-                        )
-                ));
+        var itemsBySale = allItems.stream().collect(Collectors.groupingBy(
+                si -> si.getVenda().getIdVenda(),
+                Collectors.mapping(si -> {
+                    int qtd = si.getQuantidade();
+                    BigDecimal unitSale = si.getPrecoCustoUnitario();
+                    BigDecimal subSale  = unitSale.multiply(BigDecimal.valueOf(qtd));
+                    BigDecimal unitBuy  = si.getPrecoCustoUnitario();
+                    BigDecimal subBuy   = unitBuy.multiply(BigDecimal.valueOf(qtd));
+                    return new SaleItemResponseDTO(
+                            si.getIdItemVenda(), si.getProduto().getIdProduto(), si.getProduto().getNomeProduto(),
+                            qtd, unitSale, subSale, unitBuy, subBuy
+                    );
+                }, Collectors.toList())
+        ));
 
         return sales.stream().map(sale -> {
             var items = itemsBySale.getOrDefault(sale.getIdVenda(), List.of());
-
-
-            BigDecimal totalVenda = sale.getTotalVenda();
-
+            BigDecimal totalVenda  = sale.getTotalVenda();
+            BigDecimal totalCompra = items.stream()
+                    .map(SaleItemResponseDTO::subTotalPago)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
             int totalItens = items.stream().mapToInt(SaleItemResponseDTO::quantidade).sum();
 
-            var totalBuy = items.stream().map(SaleItemResponseDTO::subTotalPago).reduce(BigDecimal.ZERO, BigDecimal::add);
-
-            var totals = new SaleTotalDTO(totalItens, totalBuy, totalVenda);
-
-            String tipoPagamento = sale.getTipoPagamento().getTipoPagamento();
+            var totals = new SaleTotalDTO(totalItens, totalVenda, totalCompra);
 
             return new SaleResponseDTO(
                     sale.getIdVenda(),
                     sale.getDataVenda(),
-                    tipoPagamento,
+                    sale.getTipoPagamento().getTipoPagamento(),
                     items,
                     totals
             );
         }).toList();
     }
+
+
+    @Transactional
+    public SalePeriodDTO findByDateRange(LocalDate from, LocalDate to) {
+        if (from == null || to == null) throw new IllegalArgumentException("from e to são obrigatórios");
+        if (to.isBefore(from)) throw new IllegalArgumentException("data final não pode ser anterior à inicial");
+
+        var start = from.atStartOfDay();
+        var endExclusive = to.plusDays(1).atStartOfDay();
+
+        var sales = saleRepository.findAllByPeriodoFetchPayment(start, endExclusive);
+        if (sales.isEmpty()) {
+            return new SalePeriodDTO(
+                    new SalePeriodSummaryDTO(from, to, 0, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO),
+                    List.of()
+            );
+        }
+
+        var saleIds  = sales.stream().map(Sale::getIdVenda).toList();
+        var allItems = itemRepository.findByVendaIdInFetchProduct(saleIds);
+
+        var itemsBySale = allItems.stream().collect(Collectors.groupingBy(
+                si -> si.getVenda().getIdVenda(),
+                Collectors.mapping(si -> {
+                    int qtd = si.getQuantidade();
+                    BigDecimal unitSale = si.getPrecoUnitario();
+                    BigDecimal subSale  = unitSale.multiply(BigDecimal.valueOf(qtd));
+
+                    BigDecimal unitBuy  = si.getProduto().getValorPagoProduto();
+                    BigDecimal subBuy   = unitBuy.multiply(BigDecimal.valueOf(qtd));
+
+                    return new SaleItemResponseDTO(
+                            si.getIdItemVenda(), si.getProduto().getIdProduto(), si.getProduto().getNomeProduto(),
+                            qtd, unitSale, subSale, unitBuy, subBuy
+                    );
+                }, Collectors.toList())
+        ));
+
+        var saleDtos = sales.stream().map(sale -> {
+            var items = itemsBySale.getOrDefault(sale.getIdVenda(), List.of());
+
+            BigDecimal faturado = items.stream()
+                    .map(SaleItemResponseDTO::subTotalVenda)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            BigDecimal custo = items.stream()
+                    .map(SaleItemResponseDTO::subTotalPago)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            BigDecimal lucro = faturado.subtract(custo);
+            int totalItens   = items.stream().mapToInt(SaleItemResponseDTO::quantidade).sum();
+
+            var totals = new SalesRangeTotalDTO(totalItens, custo, faturado, lucro);
+
+            return new SalesRangeResponseDTO(
+                    sale.getIdVenda(),
+                    sale.getDataVenda(),
+                    sale.getTipoPagamento().getTipoPagamento(),
+                    items,
+                    totals
+            );
+        }).toList();
+
+        int totalItensPeriodo = saleDtos.stream().mapToInt(d -> d.totals().totalItens()).sum();
+        BigDecimal custoPeriodo = saleDtos.stream()
+                .map(d -> d.totals().custo())
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal faturadoPeriodo = saleDtos.stream()
+                .map(d -> d.totals().faturado())
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal lucroPeriodo = faturadoPeriodo.subtract(custoPeriodo);
+
+        var summary = new SalePeriodSummaryDTO(from, to, totalItensPeriodo, custoPeriodo, faturadoPeriodo, lucroPeriodo);
+
+        return new SalePeriodDTO(summary, saleDtos);
+    }
+
+
+
+
 }
 
