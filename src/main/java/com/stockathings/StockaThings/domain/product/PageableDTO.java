@@ -1,4 +1,4 @@
-package com.stockathings.StockaThings.domain.products;
+package com.stockathings.StockaThings.domain.product;
 
 import java.util.List;
 

@@ -1,8 +1,6 @@
 package com.stockathings.StockaThings.controllers;
 
 
-import com.stockathings.StockaThings.domain.products.Product;
-import com.stockathings.StockaThings.domain.products.ProductRequestDTO;
 import com.stockathings.StockaThings.domain.service.UnityMeasureService;
 import com.stockathings.StockaThings.domain.unitymeasure.UnityMeasure;
 import com.stockathings.StockaThings.domain.unitymeasure.UnityMeasureRequestDTO;

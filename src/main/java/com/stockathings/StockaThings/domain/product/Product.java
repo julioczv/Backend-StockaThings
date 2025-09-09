@@ -1,4 +1,4 @@
-package com.stockathings.StockaThings.domain.products;
+package com.stockathings.StockaThings.domain.product;
 
 
 import com.stockathings.StockaThings.domain.category.Category;
@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.util.UUID;
 
 @Table(name = "produto") // Nome da nossa tabela no Postgree
 @Entity //Quer dizer que tudo que esta dentro da classe vira uma instancia o entity precisa ter um @Id pra funcionar
@@ -39,7 +38,7 @@ public class Product {
     private BigDecimal valorVendaProduto;
 
     @Column(name = "produto_qtde")
-    private Integer QuantidadeProduto;
+    private Integer qtdProduto;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "unidmed_id")
