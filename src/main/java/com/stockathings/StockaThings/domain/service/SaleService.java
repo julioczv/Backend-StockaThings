@@ -11,7 +11,9 @@ import com.stockathings.StockaThings.repositories.SaleRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -234,7 +236,31 @@ public class SaleService {
         return new SalePeriodDTO(summary, saleDtos);
     }
 
+    @Transactional
+    public void deleteSale(Long saleId, User me) {
+        boolean pertence = saleRepository.existsByIdVendaAndUsuario_Id(saleId, me.getId());
 
+        if(!pertence) {
+            if(saleRepository.existsById(saleId)) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Essa venda não existe no seu banco de dados");
+            }
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Venda não encontrada");
+        }
+
+        var itens = itemRepository.findByVendaIdFetchProductForUpdate(saleId);
+
+        for(var si : itens) {
+            int qtd = si.getQuantidade();
+            int rows = productRepository.addStock(si.getProduto().getIdProduto(), me.getId(), qtd);
+            if(rows == 0){
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Não foi possível estornar o estoque do produto" + si.getProduto().getNomeProduto());
+            }
+        }
+        int del = saleRepository.deleteByIdAndUsuarioId(saleId, me.getId());
+        if(del == 0) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Falha ao excluir a venda");
+        }
+    }
 
 
 }
