@@ -2,6 +2,7 @@ package com.stockathings.StockaThings.domain.sale;
 
 
 import com.stockathings.StockaThings.domain.payment.Payment;
+import com.stockathings.StockaThings.domain.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,4 +35,8 @@ public class Sale {
     @JoinColumn(name = "tipopag_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private Payment tipoPagamento;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn( name = "usuario_id", columnDefinition = "uuid")
+    private User usuario;
 }

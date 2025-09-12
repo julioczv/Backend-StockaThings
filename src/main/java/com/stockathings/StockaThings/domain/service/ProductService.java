@@ -4,6 +4,7 @@ import com.stockathings.StockaThings.domain.product.PageableDTO;
 import com.stockathings.StockaThings.domain.product.Product;
 import com.stockathings.StockaThings.domain.product.ProductRequestDTO;
 import com.stockathings.StockaThings.domain.product.ProductResponseDTO;
+import com.stockathings.StockaThings.domain.user.User;
 import com.stockathings.StockaThings.repositories.CategoryRepository;
 import com.stockathings.StockaThings.repositories.ProductRepository;
 import com.stockathings.StockaThings.repositories.UnityMeasureRepository;
@@ -25,27 +26,28 @@ public class ProductService {
     private final CategoryRepository categoriaRepo;
 
     @Transactional
-    public Product createProduct(ProductRequestDTO data /*Aqui chamados a nossa DTO de data*/){ //Passamos a nossa DTO para mapeala
-        Product product = new Product(); //Instanciamos a classe para a poder receber os campos
-
-        var unidade = unidadeRepo.findById(data.unidadeMedidaId())
+    public ProductResponseDTO createProduct(ProductRequestDTO in, User me){
+        var unidade = unidadeRepo.findById(in.unidadeMedidaId())
                 .orElseThrow(() -> new RuntimeException("Unidade de medida não encontrada"));
-
-        var categoria = categoriaRepo.findById(data.categoriaId())
+        var categoria = categoriaRepo.findById(in.categoriaId())
                 .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
 
-        product.setNomeProduto(data.nomeProduto());
-        product.setDescricaoProduto(data.descricaoProduto());
-        product.setValorPagoProduto(data.valorPagoProduto());
-        product.setValorVendaProduto(data.valorVendaProduto());
-        product.setQtdProduto(data.quantidadeProduto());
+        var product = new Product();
+        product.setNomeProduto(in.nomeProduto());
+        product.setDescricaoProduto(in.descricaoProduto());
+        product.setValorPagoProduto(in.valorPagoProduto());
+        product.setValorVendaProduto(in.valorVendaProduto());
+        product.setQtdProduto(in.quantidadeProduto());
+
         product.setUnidadeMedida(unidade);
         product.setCategoria(categoria);
 
 
-        repository.save(product);
+        product.setUsuario(me);
 
-        return product;
+        var saved = repository.save(product);
+
+        return ProductResponseDTO.from(saved);
     }
 
     public PageableDTO<ProductResponseDTO> getAllProducts(int page, int size) {
@@ -62,7 +64,9 @@ public class ProductService {
                 product.getUnidadeMedida().getIdUnidMedida(),
                 product.getUnidadeMedida().getUnidMedida(),
                 product.getCategoria().getIdCategoria(),
-                product.getCategoria().getNomeCategoria()
+                product.getCategoria().getNomeCategoria(),
+                product.getUsuario().getId(),
+                product.getUsuario().getNome()
 
         )).getContent();
 
@@ -76,8 +80,14 @@ public class ProductService {
     }
 
 
-    public String deleteProduct(Long idProduto){
-        repository.deleteById(idProduto);
-        return "Produto deletado com sucesso !";
+    @Transactional
+    public void deleteProduct(Long idProduto, User me) {
+        int rows = repository.deleteByIdAndUsuarioId(idProduto, me.getId());
+        if (rows == 0) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.NOT_FOUND,
+                    "Produto não encontrado"
+            );
+        }
     }
 }

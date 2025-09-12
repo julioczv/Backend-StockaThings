@@ -3,6 +3,7 @@ package com.stockathings.StockaThings.domain.service;
 import com.stockathings.StockaThings.domain.sale.*;
 import com.stockathings.StockaThings.domain.saleitem.SaleItem;
 import com.stockathings.StockaThings.domain.saleitem.SaleItemResponseDTO;
+import com.stockathings.StockaThings.domain.user.User;
 import com.stockathings.StockaThings.repositories.PaymentRepository;
 import com.stockathings.StockaThings.repositories.ProductRepository;
 import com.stockathings.StockaThings.repositories.SaleItemRepository;
@@ -32,13 +33,13 @@ public class SaleService {
 
 
     @Transactional
-    public SaleResponseDTO createSale(SaleRequestDTO data) {
+    public SaleResponseDTO createSale(SaleRequestDTO in, User me) {
 
-        if (data.items() == null || data.items().isEmpty()) {
+        if (in.items() == null || in.items().isEmpty()) {
             throw new IllegalArgumentException("Por favor selecione pelo menos um item");
         }
 
-        var pm = pmRepository.findById(data.tipoPagamentoId())
+        var pm = pmRepository.findById(in.tipoPagamentoId())
                 .orElseThrow(() -> new RuntimeException("Método de pagamento não encontrado"));
 
         Sale sale = new Sale();
@@ -46,6 +47,7 @@ public class SaleService {
         sale.setDataVenda(LocalDateTime.now());
 
         sale.setTipoPagamento(pm);
+        sale.setUsuario(me);
 
         sale.setTotalVenda(BigDecimal.ZERO);
 
@@ -57,7 +59,7 @@ public class SaleService {
         BigDecimal totalCompra = BigDecimal.ZERO;
         int totalItens = 0;
 
-        for (var item : data.items()) {
+        for (var item : in.items()) {
             var product = productRepository.findById(item.idProduto())
                     .orElseThrow(() -> new IllegalArgumentException("Produto não encontrado: " + item.idProduto()));
 
@@ -113,7 +115,7 @@ public class SaleService {
         );
     }
 
-    @Transactional
+   /* @Transactional
     public List<SaleResponseDTO> findAllSales() {
         var sales = saleRepository.findAll();
         if (sales.isEmpty()) return List.of();
@@ -154,7 +156,7 @@ public class SaleService {
                     totals
             );
         }).toList();
-    }
+    }*/
 
 
     @Transactional

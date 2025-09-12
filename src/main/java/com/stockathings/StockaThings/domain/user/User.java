@@ -1,5 +1,6 @@
 package com.stockathings.StockaThings.domain.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,6 +33,7 @@ public class User implements UserDetails {
     @Column(name = "login")
     private String login;
 
+    @JsonIgnore
     @Column(name = "senha")
     private String senha;
 
@@ -41,7 +43,7 @@ public class User implements UserDetails {
     @Column(name = "usuario_cnpj")
     private String cnpj;
 
-    @Column(name = "usuario_nomeSocial")
+    @Column(name = "usuario_nome_social")
     private String nomeSocial;
 
     @Column(name = "usuario_cidade")
@@ -93,6 +95,7 @@ public class User implements UserDetails {
         return login;
     }
 
+    @JsonIgnore
     @Override
     public String getPassword() {
         return senha;

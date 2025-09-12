@@ -2,10 +2,12 @@ package com.stockathings.StockaThings.controllers;
 
 import com.stockathings.StockaThings.domain.sale.*;
 import com.stockathings.StockaThings.domain.service.SaleService;
+import com.stockathings.StockaThings.domain.user.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -20,15 +22,16 @@ public class SaleController {
     private SaleService saleService;
 
     @PostMapping
-    public ResponseEntity<SaleResponseDTO> create(@RequestBody SaleRequestDTO dto) {
-        var resp = saleService.createSale(dto);
+    public ResponseEntity<SaleResponseDTO> create(@RequestBody SaleRequestDTO in,
+                                                  @AuthenticationPrincipal User me) {
+        var resp = saleService.createSale(in, me);
         return ResponseEntity.status(HttpStatus.CREATED).body(resp);
     }
 
-    @GetMapping
+    /*@GetMapping
     public ResponseEntity<List<SaleResponseDTO>> findAll() {
         return ResponseEntity.ok(saleService.findAllSales());
-    }
+    }*/
 
     @GetMapping("/periodo")
     public SalePeriodDTO porPeriodo(

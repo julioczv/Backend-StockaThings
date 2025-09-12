@@ -1,0 +1,1 @@
+ALTER TABLE public.itensvenda ALTER COLUMN itv_qtde TYPE integer USING itv_qtde::integer;
