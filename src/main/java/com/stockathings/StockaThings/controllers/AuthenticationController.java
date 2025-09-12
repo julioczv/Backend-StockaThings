@@ -6,19 +6,20 @@ import com.stockathings.StockaThings.domain.user.RegisterDTO;
 import com.stockathings.StockaThings.domain.user.User;
 import com.stockathings.StockaThings.infra.security.TokenService;
 import com.stockathings.StockaThings.repositories.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
+
+import java.time.Instant;
 
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/auth")
 public class AuthenticationController {
 
@@ -31,6 +32,10 @@ public class AuthenticationController {
 
     @Autowired
     private TokenService tokenService;
+
+    /*@Autowired
+    private final TokenBlackList blacklist;*/
+
 
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody @Valid AuthenticationDTO data) {
@@ -57,4 +62,23 @@ public class AuthenticationController {
 
         return ResponseEntity.ok("Conta criada com sucesso");
     }
+
+
+   /* @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@RequestHeader("Authorization") String authHeader) {
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) return ResponseEntity.noContent().build();
+        String token = authHeader.substring(7).trim();
+
+        String jti = tokenService.getJti(token);
+        Instant exp = tokenService.getExpiration(token);
+        if (jti != null && exp != null) {
+            blacklist.block(jti, exp);
+        }
+
+        // se você guarda o token em cookie HttpOnly, zere o cookie:
+        return ResponseEntity.noContent()
+                .header("Set-Cookie","token=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Lax")
+                .build();
+    }*/
 }

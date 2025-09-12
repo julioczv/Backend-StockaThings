@@ -1,18 +1,23 @@
 package com.stockathings.StockaThings.infra.security;
 
+import com.stockathings.StockaThings.domain.user.User;
 import com.stockathings.StockaThings.repositories.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import javax.sql.DataSource;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 
 @Component
 //herda essa OncePerRequestFilter que faz a verificação do token, ele descriptografa o has verifica
@@ -25,6 +30,10 @@ public class SecurityFilter extends OncePerRequestFilter {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    private DataSource dataSource;
+
+
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String p = request.getServletPath();
@@ -36,7 +45,8 @@ public class SecurityFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String token = recoverToken(request);
-        if (token != null) {
+
+        if (token != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             String subject = tokenService.validateToken(token);
             if (subject != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails user = userRepository.findByLogin(subject);
@@ -44,6 +54,23 @@ public class SecurityFilter extends OncePerRequestFilter {
                 if (user != null) {
                     var auth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
                     SecurityContextHolder.getContext().setAuthentication(auth);
+
+                    if(user instanceof User u && u.getId() != null) {
+                        Connection conn = null;
+                        try{
+                            conn = DataSourceUtils.getConnection(dataSource);
+                            try (PreparedStatement ps = conn.prepareStatement(
+                                    "select set_config('app.current_usuario', ?, false)")) {
+                                ps.setString(1, u.getId().toString());
+                                ps.execute();
+                            }
+                        } catch (Exception e) {
+                            throw new ServletException("Falha ao propagar tenant para RLS", e);
+                        } finally {
+                            DataSourceUtils.releaseConnection(conn, dataSource);
+                        }
+
+                    }
                 }
             }
         }

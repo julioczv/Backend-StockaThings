@@ -1,8 +1,10 @@
 package com.stockathings.StockaThings.domain.product;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.stockathings.StockaThings.domain.category.Category;
 import com.stockathings.StockaThings.domain.unitymeasure.UnityMeasure;
+import com.stockathings.StockaThings.domain.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -40,12 +42,18 @@ public class Product {
     @Column(name = "produto_qtde")
     private Integer qtdProduto;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "unidmed_id")
     private UnityMeasure unidadeMedida;
 
+    @JsonIgnore
     @JoinColumn(name = "categoria_id")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Category categoria;
+
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name="usuario_id", nullable=false, columnDefinition="uuid")
+    private User usuario;
 
 }

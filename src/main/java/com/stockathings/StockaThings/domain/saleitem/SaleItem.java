@@ -2,6 +2,7 @@ package com.stockathings.StockaThings.domain.saleitem;
 
 import com.stockathings.StockaThings.domain.product.Product;
 import com.stockathings.StockaThings.domain.sale.Sale;
+import com.stockathings.StockaThings.domain.user.User;
 import jakarta.persistence.*;
 import lombok.Data;
 
