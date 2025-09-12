@@ -1,10 +1,7 @@
 package com.stockathings.StockaThings.controllers;
 
 
-import com.stockathings.StockaThings.domain.product.PageableDTO;
-import com.stockathings.StockaThings.domain.product.Product;
-import com.stockathings.StockaThings.domain.product.ProductRequestDTO;
-import com.stockathings.StockaThings.domain.product.ProductResponseDTO;
+import com.stockathings.StockaThings.domain.product.*;
 import com.stockathings.StockaThings.domain.service.ProductService;
 import com.stockathings.StockaThings.domain.user.User;
 import lombok.RequiredArgsConstructor;
@@ -21,22 +18,27 @@ public class ProductController {
 
     private final ProductService productService;
 
-    @PostMapping(produces="application/json", consumes="application/json")
+    @PostMapping(produces = "application/json", consumes = "application/json")
     public ResponseEntity<ProductResponseDTO> createProduct(@RequestBody ProductRequestDTO in,
-                                                     @AuthenticationPrincipal User me) {
+                                                            @AuthenticationPrincipal User me) {
         var dto = productService.createProduct(in, me);
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
 
     @GetMapping
     public ResponseEntity<PageableDTO<ProductResponseDTO>>
-    getProduct(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10")int size){
-            PageableDTO<ProductResponseDTO> allProducts = this.productService.getAllProducts(page, size);
-            return ResponseEntity.ok(allProducts);
+    getProduct(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        PageableDTO<ProductResponseDTO> allProducts = this.productService.getAllProducts(page, size);
+        return ResponseEntity.ok(allProducts);
     }
 
-/*    @PutMapping
-    public ResponseEntity<Product> update(@RequestBody ProductRequestDTO body){}*/
+    @PutMapping("/{idProduto}")
+    public ResponseEntity<ProductResponseDTO> updateProduct(@PathVariable Long idProduto,
+                                                            @RequestBody ProductUpdateDTO in,
+                                                            @AuthenticationPrincipal User me) {
+        var dto = productService.updateProduct(idProduto, in, me);
+        return ResponseEntity.ok(dto);
+    }
 
 
     @DeleteMapping("/{idProduto}")
