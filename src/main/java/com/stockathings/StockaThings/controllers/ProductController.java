@@ -6,6 +6,7 @@ import com.stockathings.StockaThings.domain.product.Product;
 import com.stockathings.StockaThings.domain.product.ProductRequestDTO;
 import com.stockathings.StockaThings.domain.product.ProductResponseDTO;
 import com.stockathings.StockaThings.domain.service.ProductService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,8 +31,18 @@ public class ProductController {
             return ResponseEntity.ok(allProducts);
     }
 
-/*    @PutMapping
-    public ResponseEntity<Product> update(@RequestBody ProductRequestDTO body){}*/
+    @GetMapping("/{id}")
+    public ResponseEntity<ProductResponseDTO> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(productService.getProduct(id));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ProductResponseDTO> update(
+            @PathVariable Long id,
+            @RequestBody @Valid ProductRequestDTO body
+    ) {
+        return ResponseEntity.ok(productService.updateProduct(id, body));
+    }
 
 
     @DeleteMapping("/{idProduto}")

@@ -75,6 +75,50 @@ public class ProductService {
         );
     }
 
+    @Transactional(readOnly = true)
+    public ProductResponseDTO getProduct(Long idProduto){
+        Product product = repository.findById(idProduto).orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+
+        return toDto(product);
+    }
+
+    private ProductResponseDTO toDto(Product product) {
+        return new ProductResponseDTO(
+                product.getIdProduto(),
+                product.getNomeProduto(),
+                product.getDescricaoProduto(),
+                product.getValorPagoProduto(),
+                product.getValorVendaProduto(),
+                product.getQuantidadeProduto(),
+                product.getUnidadeMedida().getIdUnidMedida(),
+                product.getUnidadeMedida().getUnidMedida(),
+                product.getCategoria().getIdCategoria(),
+                product.getCategoria().getNomeCategoria()
+        );
+    }
+
+    @Transactional
+    public ProductResponseDTO updateProduct(Long idProduto, ProductRequestDTO data) {
+        Product product = repository.findById(idProduto)
+                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+
+        var unidade = unidadeRepo.findById(data.unidadeMedidaId())
+                .orElseThrow(() -> new RuntimeException("Unidade de medida não encontrada"));
+
+        var categoria = categoriaRepo.findById(data.categoriaId())
+                .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
+
+        product.setNomeProduto(data.nomeProduto());
+        product.setDescricaoProduto(data.descricaoProduto());
+        product.setValorPagoProduto(data.valorPagoProduto());
+        product.setValorVendaProduto(data.valorVendaProduto());
+        product.setQuantidadeProduto(data.quantidadeProduto());
+        product.setUnidadeMedida(unidade);
+        product.setCategoria(categoria);
+
+        repository.save(product);
+        return toDto(product);
+    }
 
     public String deleteProduct(Long idProduto){
         repository.deleteById(idProduto);
