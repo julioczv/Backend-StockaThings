@@ -1,7 +1,11 @@
 package com.stockathings.StockaThings.domain.sale;
 
-import java.math.BigDecimal;
-import java.util.Date;
+import com.stockathings.StockaThings.domain.saleitem.SaleItemResponseDTO;
 
-public record SaleResponseDTO(Long id, Date dataVenda, BigDecimal totalVenda, Long tipoPagamento) {
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.List;
+
+public record SaleResponseDTO(Long idVenda, LocalDateTime dataVenda, String pagamento, List<SaleItemResponseDTO> items, SaleTotalDTO total) {
 }
