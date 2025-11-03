@@ -76,6 +76,29 @@ public class ProductService {
         );
     }
 
+    public ProductResponseDTO getProduct(Long idProduto){
+        Product product = repository.findById(idProduto).orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+
+        return toDto(product);
+    }
+
+    public static ProductResponseDTO toDto(Product p) {
+        return new ProductResponseDTO(
+                p.getIdProduto(),
+                p.getNomeProduto(),
+                p.getDescricaoProduto(),
+                p.getValorPagoProduto(),
+                p.getValorVendaProduto(),
+                p.getQtdProduto(),
+                p.getUnidadeMedida().getIdUnidMedida(),
+                p.getUnidadeMedida().getUnidMedida(),
+                p.getCategoria().getIdCategoria(),
+                p.getCategoria().getNomeCategoria(),
+                p.getUsuario() != null ? p.getUsuario().getId() : null,
+                p.getUsuario() != null ? p.getUsuario().getNome() : null
+        );
+    }
+
 
     @Transactional
     public void deleteProduct(Long idProduto, User me) {
