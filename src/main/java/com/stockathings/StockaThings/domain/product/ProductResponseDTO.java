@@ -13,7 +13,7 @@ public record ProductResponseDTO(
         Long unidmedId,
         String unidmedNome,
         Long categoriaId,
-        String categoriaNome,
+        String nomeCategoria,
         UUID usuarioId,
         String nomeEmpresa
 ) {
@@ -25,9 +25,9 @@ public record ProductResponseDTO(
                 p.getValorPagoProduto(),
                 p.getValorVendaProduto(),
                 p.getQtdProduto(),
-                p.getUnidadeMedida().getIdUnidMedida(),
+                p.getUnidadeMedida().getUnidadeMedidaId(),
                 p.getUnidadeMedida().getUnidMedida(),
-                p.getCategoria().getIdCategoria(),
+                p.getCategoria().getCategoriaId(),
                 p.getCategoria().getNomeCategoria(),
                 p.getUsuario() != null ? p.getUsuario().getId() : null,
                 p.getUsuario().getNome()

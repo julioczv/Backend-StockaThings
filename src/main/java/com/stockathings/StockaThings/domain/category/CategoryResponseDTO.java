@@ -1,4 +1,4 @@
 package com.stockathings.StockaThings.domain.category;
 
-public record CategoryResponseDTO(Long idCategoria, String nomeCategoria) {
+public record CategoryResponseDTO(Long categoriaId, String nomeCategoria) {
 }

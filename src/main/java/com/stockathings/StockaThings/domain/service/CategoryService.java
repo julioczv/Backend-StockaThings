@@ -36,11 +36,11 @@ public class CategoryService {
         return repository.findAll().
                 stream().
                 map( category ->
-                new CategoryResponseDTO(category.getIdCategoria(), category.getNomeCategoria())).toList();
+                new CategoryResponseDTO(category.getCategoriaId(), category.getNomeCategoria())).toList();
     }
 
-    public String deleteCategory(Long idCategoria) {
-        repository.deleteById(idCategoria);
+    public String deleteCategory(Long categoriaId) {
+        repository.deleteById(categoriaId);
         return "Categoria deletada com sucesso !";
     }
 }

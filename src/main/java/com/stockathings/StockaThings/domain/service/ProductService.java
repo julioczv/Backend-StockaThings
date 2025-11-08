@@ -1,9 +1,6 @@
 package com.stockathings.StockaThings.domain.service;
 
-import com.stockathings.StockaThings.domain.product.PageableDTO;
-import com.stockathings.StockaThings.domain.product.Product;
-import com.stockathings.StockaThings.domain.product.ProductRequestDTO;
-import com.stockathings.StockaThings.domain.product.ProductResponseDTO;
+import com.stockathings.StockaThings.domain.product.*;
 import com.stockathings.StockaThings.domain.user.User;
 import com.stockathings.StockaThings.repositories.CategoryRepository;
 import com.stockathings.StockaThings.repositories.ProductRepository;
@@ -18,7 +15,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service //Diz para a classe que ela é do tipo service
+@Transactional
 @RequiredArgsConstructor
+
 public class ProductService {
 
     private final ProductRepository repository;
@@ -37,7 +36,7 @@ public class ProductService {
         product.setDescricaoProduto(in.descricaoProduto());
         product.setValorPagoProduto(in.valorPagoProduto());
         product.setValorVendaProduto(in.valorVendaProduto());
-        product.setQtdProduto(in.quantidadeProduto());
+        product.setQtdProduto(in.qtdProduto());
 
         product.setUnidadeMedida(unidade);
         product.setCategoria(categoria);
@@ -49,7 +48,7 @@ public class ProductService {
 
         return ProductResponseDTO.from(saved);
     }
-
+    @Transactional(readOnly = true)
     public PageableDTO<ProductResponseDTO> getAllProducts(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Product> productsPage = repository.findAll(pageable);
@@ -61,9 +60,9 @@ public class ProductService {
                 product.getValorPagoProduto(),
                 product.getValorVendaProduto(),
                 product.getQtdProduto(),
-                product.getUnidadeMedida().getIdUnidMedida(),
+                product.getUnidadeMedida().getUnidadeMedidaId(),
                 product.getUnidadeMedida().getUnidMedida(),
-                product.getCategoria().getIdCategoria(),
+                product.getCategoria().getCategoriaId(),
                 product.getCategoria().getNomeCategoria(),
                 product.getUsuario().getId(),
                 product.getUsuario().getNome()
@@ -79,6 +78,30 @@ public class ProductService {
         );
     }
 
+    @Transactional(readOnly = true)
+    public ProductResponseDTO getProduct(Long idProduto){
+        Product product = repository.findById(idProduto).orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+
+        return toDto(product);
+    }
+
+    public static ProductResponseDTO toDto(Product p) {
+        return new ProductResponseDTO(
+                p.getIdProduto(),
+                p.getNomeProduto(),
+                p.getDescricaoProduto(),
+                p.getValorPagoProduto(),
+                p.getValorVendaProduto(),
+                p.getQtdProduto(),
+                p.getUnidadeMedida().getUnidadeMedidaId(),
+                p.getUnidadeMedida().getUnidMedida(),
+                p.getCategoria().getCategoriaId(),
+                p.getCategoria().getNomeCategoria(),
+                p.getUsuario() != null ? p.getUsuario().getId() : null,
+                p.getUsuario() != null ? p.getUsuario().getNome() : null
+        );
+    }
+
 
     @Transactional
     public void deleteProduct(Long idProduto, User me) {
@@ -90,4 +113,35 @@ public class ProductService {
             );
         }
     }
+
+    @Transactional
+    public ProductResponseDTO updateProduct(Long idProduto, ProductUpdateDTO in, User me) {
+        var product = repository.findByIdAndUsuarioIdForUpdate(idProduto, me.getId())
+                .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(
+                        org.springframework.http.HttpStatus.NOT_FOUND,
+                        "Produto não encontrado para este usuário"
+                ));
+
+        if (in.nomeProduto() != null)        product.setNomeProduto(in.nomeProduto());
+        if (in.descricaoProduto() != null)   product.setDescricaoProduto(in.descricaoProduto());
+        if (in.valorPagoProduto() != null)   product.setValorPagoProduto(in.valorPagoProduto());
+        if (in.valorVendaProduto() != null)  product.setValorVendaProduto(in.valorVendaProduto());
+        if (in.qtdProduto() != null)  product.setQtdProduto(in.qtdProduto());
+
+        if (in.unidadeMedidaId() != null) {
+            var un = unidadeRepo.findById(in.unidadeMedidaId())
+                    .orElseThrow(() -> new RuntimeException("Unidade de medida não encontrada"));
+            product.setUnidadeMedida(un);
+        }
+
+        if (in.categoriaId() != null) {
+            var cat = categoriaRepo.findById(in.categoriaId())
+                    .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
+            product.setCategoria(cat);
+        }
+
+        repository.save(product);
+        return ProductResponseDTO.from(product);
+    }
+
 }

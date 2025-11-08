@@ -19,7 +19,7 @@ public class UnityMeasure {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 
     @Column(name = "unidmed_id")
-    private Long idUnidMedida;
+    private Long unidadeMedidaId;
 
     @Column(name = "unidmed_nome", nullable = false, unique = true)
     private String unidMedida;

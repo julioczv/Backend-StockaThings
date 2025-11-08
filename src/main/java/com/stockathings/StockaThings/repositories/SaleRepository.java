@@ -2,12 +2,14 @@ package com.stockathings.StockaThings.repositories;
 
 import com.stockathings.StockaThings.domain.sale.Sale;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 public interface SaleRepository extends JpaRepository<Sale, Long> {
     @Query("select s from Sale s join fetch s.tipoPagamento")
@@ -29,4 +31,10 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
            """)
     BigDecimal sumTotalVendaByPeriodo(@Param("start") LocalDateTime start,
                                       @Param("end")   LocalDateTime end);
+
+    boolean existsByIdVendaAndUsuario_Id(Long idVenda, UUID usuarioId);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("delete from Sale s where s.idVenda = :id and s.usuario.id = :usuarioId")
+    int deleteByIdAndUsuarioId(@Param("id") Long id, @Param("usuarioId") UUID usuarioId);
 }
