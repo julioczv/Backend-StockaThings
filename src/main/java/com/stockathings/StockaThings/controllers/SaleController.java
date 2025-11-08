@@ -29,11 +29,6 @@ public class SaleController {
         return ResponseEntity.status(HttpStatus.CREATED).body(resp);
     }
 
-    /*@GetMapping
-    public ResponseEntity<List<SaleResponseDTO>> findAll() {
-        return ResponseEntity.ok(saleService.findAllSales());
-    }*/
-
     @GetMapping("/periodo")
     public SalePeriodDTO porPeriodo(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,

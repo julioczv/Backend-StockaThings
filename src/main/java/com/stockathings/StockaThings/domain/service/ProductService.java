@@ -15,7 +15,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service //Diz para a classe que ela é do tipo service
+@Transactional
 @RequiredArgsConstructor
+
 public class ProductService {
 
     private final ProductRepository repository;
@@ -34,7 +36,7 @@ public class ProductService {
         product.setDescricaoProduto(in.descricaoProduto());
         product.setValorPagoProduto(in.valorPagoProduto());
         product.setValorVendaProduto(in.valorVendaProduto());
-        product.setQtdProduto(in.quantidadeProduto());
+        product.setQtdProduto(in.qtdProduto());
 
         product.setUnidadeMedida(unidade);
         product.setCategoria(categoria);
@@ -46,7 +48,7 @@ public class ProductService {
 
         return ProductResponseDTO.from(saved);
     }
-
+    @Transactional(readOnly = true)
     public PageableDTO<ProductResponseDTO> getAllProducts(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Product> productsPage = repository.findAll(pageable);
@@ -58,9 +60,9 @@ public class ProductService {
                 product.getValorPagoProduto(),
                 product.getValorVendaProduto(),
                 product.getQtdProduto(),
-                product.getUnidadeMedida().getIdUnidMedida(),
+                product.getUnidadeMedida().getUnidadeMedidaId(),
                 product.getUnidadeMedida().getUnidMedida(),
-                product.getCategoria().getIdCategoria(),
+                product.getCategoria().getCategoriaId(),
                 product.getCategoria().getNomeCategoria(),
                 product.getUsuario().getId(),
                 product.getUsuario().getNome()
@@ -76,6 +78,7 @@ public class ProductService {
         );
     }
 
+    @Transactional(readOnly = true)
     public ProductResponseDTO getProduct(Long idProduto){
         Product product = repository.findById(idProduto).orElseThrow(() -> new RuntimeException("Produto não encontrado"));
 
@@ -90,9 +93,9 @@ public class ProductService {
                 p.getValorPagoProduto(),
                 p.getValorVendaProduto(),
                 p.getQtdProduto(),
-                p.getUnidadeMedida().getIdUnidMedida(),
+                p.getUnidadeMedida().getUnidadeMedidaId(),
                 p.getUnidadeMedida().getUnidMedida(),
-                p.getCategoria().getIdCategoria(),
+                p.getCategoria().getCategoriaId(),
                 p.getCategoria().getNomeCategoria(),
                 p.getUsuario() != null ? p.getUsuario().getId() : null,
                 p.getUsuario() != null ? p.getUsuario().getNome() : null
@@ -123,7 +126,7 @@ public class ProductService {
         if (in.descricaoProduto() != null)   product.setDescricaoProduto(in.descricaoProduto());
         if (in.valorPagoProduto() != null)   product.setValorPagoProduto(in.valorPagoProduto());
         if (in.valorVendaProduto() != null)  product.setValorVendaProduto(in.valorVendaProduto());
-        if (in.quantidadeProduto() != null)  product.setQtdProduto(in.quantidadeProduto());
+        if (in.qtdProduto() != null)  product.setQtdProduto(in.qtdProduto());
 
         if (in.unidadeMedidaId() != null) {
             var un = unidadeRepo.findById(in.unidadeMedidaId())

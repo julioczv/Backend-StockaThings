@@ -1,4 +1,4 @@
 package com.stockathings.StockaThings.domain.unitymeasure;
 
-public record UnityMeasureResponseDTO( Long idUnidMedida, String unidMedida) {
+public record UnityMeasureResponseDTO( Long unidadeMedidaId, String unidMedida) {
 }

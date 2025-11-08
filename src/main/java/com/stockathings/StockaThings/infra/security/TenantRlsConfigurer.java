@@ -11,7 +11,9 @@ public class TenantRlsConfigurer {
     public void apply(java.util.UUID tenantId) {
         org.hibernate.Session session = em.unwrap(org.hibernate.Session.class);
         session.doWork(conn -> {
-            try (var ps = conn.prepareStatement("set local app.current_usuario = ?")) {
+            try (var ps = conn.prepareStatement(
+                    "select set_config('app.current_usuario', ?, true)"
+            )) {
                 ps.setString(1, tenantId.toString());
                 ps.execute();
             }

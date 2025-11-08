@@ -44,11 +44,11 @@ public class UnityMeasureService {
                 stream().
                 map(
                 unity ->
-                new UnityMeasureResponseDTO(unity.getIdUnidMedida(), unity.getUnidMedida())).toList();
+                new UnityMeasureResponseDTO(unity.getUnidadeMedidaId(), unity.getUnidMedida())).toList();
     }
 
-    public String deleteUnity(Long idUnidMedida) {
-        repository.deleteById(idUnidMedida);
+    public String deleteUnity(Long unidadeMedidaId) {
+        repository.deleteById(unidadeMedidaId);
         return "Unidade de medida deletada com sucesso !";
     }
 

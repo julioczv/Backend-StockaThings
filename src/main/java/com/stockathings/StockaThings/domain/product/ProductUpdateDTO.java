@@ -6,7 +6,7 @@ public record ProductUpdateDTO(String nomeProduto,
                                String descricaoProduto,
                                BigDecimal valorPagoProduto,
                                BigDecimal valorVendaProduto,
-                               Integer quantidadeProduto,
+                               Integer qtdProduto,
                                Long unidadeMedidaId,
                                Long categoriaId) {
 }

@@ -17,7 +17,7 @@ import jakarta.validation.Valid;
 
 import java.time.Instant;
 
-
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/auth")
@@ -63,22 +63,5 @@ public class AuthenticationController {
         return ResponseEntity.ok("Conta criada com sucesso");
     }
 
-
-   /* @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@RequestHeader("Authorization") String authHeader) {
-
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) return ResponseEntity.noContent().build();
-        String token = authHeader.substring(7).trim();
-
-        String jti = tokenService.getJti(token);
-        Instant exp = tokenService.getExpiration(token);
-        if (jti != null && exp != null) {
-            blacklist.block(jti, exp);
-        }
-
-        // se você guarda o token em cookie HttpOnly, zere o cookie:
-        return ResponseEntity.noContent()
-                .header("Set-Cookie","token=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Lax")
-                .build();
-    }*/
+    
 }

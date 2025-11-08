@@ -6,7 +6,7 @@ public record ProductRequestDTO(String nomeProduto,
                                 String descricaoProduto,
                                 BigDecimal valorPagoProduto,
                                 BigDecimal valorVendaProduto,
-                                Integer quantidadeProduto,
+                                Integer qtdProduto,
                                 Long unidadeMedidaId,
                                 Long categoriaId
 
